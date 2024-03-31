@@ -574,10 +574,29 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
         - book_file is the path to a CSV file corresponding to the book data
           format 
     """
-    # TODO: implement
-
-
+    # TODO: complete the implementation when user review data is received
     
+    gr = Graph()
+
+    with open(book_file, 'r') as file:
+        book_data = csv.reader(file)
+        # Skipping the header
+        next(book_data) 
+        book_dict = book_reader(book_data)
+        
+        for book in book_dict:
+            
+
+
+
+def book_reader(reader: csv.reader) -> dict[str, lst[Union[int, str]]]:
+    """
+    Takes data about books from a file and returns a dictionary 
+    containing book name mapped to a list containing the author's name, number of pages, genre, and summary
+    for them to be added them to a graph.
+    """
+
+    return {line[0]:[line[1], int(line[2]), line[3], line[4]] for line in reader}
 
 
 if __name__ == '__main__':
