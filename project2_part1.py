@@ -563,6 +563,40 @@ class Graph:
         #  I know this is a tough one so I tried to get some of the other functions out of the way.
 
 
+def load_graph(user_reviews_file: str, book_file: str) -> Graph:
+    """
+    Return a book review system as graph corresponding to the given datasets.
+    Users and Books are the vertices of this graph.
+
+    Preconditions:
+        - user_reviews_file is the path to a CSV file corresponding to the book review data
+          format 
+        - book_file is the path to a CSV file corresponding to the book data
+          format 
+    """
+
+    gr = Graph()
+
+    with open(book_file, 'r') as file:
+        book_data = csv.reader(file)
+        book_dict = book_reader(book_data)
+        for idee in book_dict:
+            gr.add_vertex(idee, 'book')
+
+    # Reading reviews and creating edges using weights :)
+
+    with open(user_reviews_file, 'r') as file:
+
+        review_data = csv.reader(file)
+
+        for line in review_data:
+            gr.add_vertex(book_dict[line[1]], 'book')
+            gr.add_vertex(line[0], 'user')
+            gr.add_edge(line[0], book_dict[line[1]], int(line[2]))
+
+    return gr
+
+
 if __name__ == '__main__':
     import doctest
 
