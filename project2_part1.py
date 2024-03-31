@@ -77,8 +77,8 @@ class _Book(_Vertex):
         """Initialize a new vertex with the given item and neighbours."""
         super().__init__(item, 'book')
         self.genre = genre
-        self.author: author
-        self.blurb: blurb
+        self.author = author
+        self.blurb = blurb
         self.reviews = {}
 
 
