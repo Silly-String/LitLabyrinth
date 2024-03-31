@@ -18,7 +18,7 @@ please consult our Course Syllabus.
 This file is Copyright (c) 2024 CSC111 Teaching Team
 """
 from __future__ import annotations
-from typing import Any
+from typing import Any, Union
 
 
 class _Vertex:
@@ -26,19 +26,23 @@ class _Vertex:
 
     Instance Attributes:
         - item: The data stored in this vertex.
-        - neighbours: The vertices that are adjacent to this vertex.
+        - kind: either 'book' or 'user' to help run checks when working with vertices
+        - neighbours: The vertices that are adjacent to this vertex; mapped to their corresponding review amount.
 
     Representation Invariants:
         - self not in self.neighbours
         - all(self in u.neighbours for u in self.neighbours)
+        - self.kind in {'book', 'user'}
     """
     item: Any
-    neighbours: set[_Vertex]
+    kind: str
+    neighbours: dict[_Vertex, Union[int, float]]
 
-    def __init__(self, item: Any, neighbours: set[_Vertex]) -> None:
+    def __init__(self, item: Any, kind: str) -> None:
         """Initialize a new vertex with the given item and neighbours."""
         self.item = item
-        self.neighbours = neighbours
+        self.kind = kind
+        self.neighbours = {}
 
 
 class _Book(_Vertex):
@@ -46,27 +50,32 @@ class _Book(_Vertex):
 
     Instance Attributes:
         - item: The data stored in this vertex.
+        - kind: 'book' to help run checks when working with vertices
         - genre: The genre of the book
         - author: The author of the book
         - blurb: A short summary of the book
-        - neighbours: The vertices that are adjacent to this vertex.
+        - reviews: a dictionary of users mapped to their corresponding reviews for the particular books.
+        - neighbours: The vertices that are adjacent to this vertex; mapped to their corresponding review amount.
 
     Representation Invariants:
         - self not in self.neighbours
         - all(self in u.neighbours for u in self.neighbours)
     """
     item: str
+    kind: str
     genre: str
     author: str
     blurb: str
     reviews: dict
-    neighbours: set[_Vertex]
+    neighbours: dict[_Vertex, Union[int, float]]
 
-    def __init__(self, item: Any, neighbours: set[_Vertex]) -> None:
+    def __init__(self, item: str, genre: str, author: str, blurb: str = '') -> None:
         """Initialize a new vertex with the given item and neighbours."""
-        super().__init__(item, neighbours)
-        self.item = item
-        self.neighbours = neighbours
+        super().__init__(item, 'book')
+        self.genre = genre
+        self.author: author
+        self.blurb: blurb
+        self.reviews = {}
 
 
 class _User(_Vertex):
@@ -74,20 +83,20 @@ class _User(_Vertex):
 
     Instance Attributes:
         - item: The data stored in this vertex.
-        - neighbours: The vertices that are adjacent to this vertex.
+        - kind: 'user' to help run checks when working with vertices
+        - neighbours: The vertices that are adjacent to this vertex; mapped to their corresponding review amount.
 
     Representation Invariants:
         - self not in self.neighbours
         - all(self in u.neighbours for u in self.neighbours)
     """
     item: str
-    neighbours: set[_Vertex]
+    kind: str
+    neighbours: dict[_Vertex, Union[int, float]]
 
     def __init__(self, item: Any, neighbours: set[_Vertex]) -> None:
         """Initialize a new vertex with the given item and neighbours."""
-        super().__init__(item, neighbours)
-        self.item = item
-        self.neighbours = neighbours
+        super().__init__(item, 'user')
 
 
 class Graph:
