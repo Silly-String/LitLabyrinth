@@ -575,6 +575,8 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
           format 
     """
     # TODO: implement
+
+
     
 
 
