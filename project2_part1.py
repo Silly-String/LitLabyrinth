@@ -27,6 +27,8 @@ from typing import Any, List, Optional, Union
 #  set methods being used on a dict. That was one of the changes we made for this project and it's probably going to
 #  pop up a lot
 #  Most fo these jsut need to be double checked to make sure nothing got missed and tha tthe implemetations make sense.
+#  When you run it with PyTA, if the functions ay too many nested whatever, see if something inside it can be broken
+#  down into a vertex function
 
 class _Vertex:
     """A vertex in a graph.
@@ -237,7 +239,6 @@ class _Book(_Vertex):
         Return None if there are no reviews for the book.
         (use the reviews dictionary)
         """
-        pass
         # TODO: implement
 
 
@@ -430,7 +431,7 @@ class Graph:
             # Book not found in the graph
             raise ValueError("Book not found in the graph.")
 
-    def get_book_info(self, book_item: Any, info_type: str = '') -> Union[dict, str]:
+    def get_book_info(self, book_item: Any, info_type: str = '') -> Union[dict, Union[str, set]]:
         """Retrieve information about a particular book in this graph.
 
         Return a dictionary containing the book information if the book is found in the graph.
@@ -449,8 +450,8 @@ class Graph:
             if isinstance(book_vertex, _Book):
                 book_info = {
                     'title': book_vertex.item,
-                    'genre': book_vertex.genre,
-                    'author': book_vertex.author,
+                    'genre': ', '.join(book_vertex.genre),
+                    'author': ', '.join(book_vertex.author),
                     'blurb': book_vertex.blurb,
                     'average_rating': average_rating
                 }
@@ -565,41 +566,188 @@ class Graph:
         #  other festures, so loosing one won't hurt too much.
         #  I know this is a tough one so I tried to get some of the other functions out of the way.
 
+    def find_books_by_genre(self, genre: str, max_books: Optional[int] = 10) -> list:
+        """Find books based on the specified genre.
 
-def load_graph(user_reviews_file: str, book_file: str) -> Graph:
-    """
-    Return a book review system as graph corresponding to the given datasets.
-    Users and Books are the vertices of this graph.
+        Return a list of books that belong to the specified genre.
+        Limit the maximum number of books returned to max_books, with a default of 10 unless otherwise specified.
+        """
+        # Initialize an empty list to store books of the specified genre
+        books_in_genre = []
 
-    Preconditions:
-        - user_reviews_file is the path to a CSV file corresponding to the book review data
-          format 
-        - book_file is the path to a CSV file corresponding to the book data
-          format 
-    """
-    # TODO: complete the implementation when user review data is received
-    
-    gr = Graph()
+        # Iterate over all vertices in the graph
+        for vertex in self._vertices.values():
+            # Check if the vertex represents a book and belongs to the specified genre
+            if isinstance(vertex, _Book) and genre in vertex.genre:
+                books_in_genre.append(vertex.item)
 
-    with open(book_file, 'r') as file:
-        book_data = csv.reader(file)
-        # Skipping the header
-        next(book_data) 
-        book_dict = book_reader(book_data)
-        
-        for book in book_dict:
-            
+                # Check if the maximum number of books has been reached
+                if len(books_in_genre) == max_books:
+                    break
+
+        return books_in_genre
+
+    def genre_similarity_score(self, book_item1: Any, book_item2: Any) -> float:
+        """Compute the genre similarity score between two books.
+
+        Return a score representing the similarity of genres between the two books.
+        The score is computed as the number of common genres divided by the minimum number of genres between the two
+        books.
+        """
+        # Retrieve the book vertices corresponding to the given book items
+        book_vertex1 = self._vertices.get(book_item1)
+        book_vertex2 = self._vertices.get(book_item2)
+
+        # If either book is not found in the graph or is not a book vertex, return 0
+        if (not book_vertex1 or not book_vertex2 or not isinstance(book_vertex1, _Book)
+                or not isinstance(book_vertex2, _Book)):
+            return 0.0
+
+        # Compute the number of common genres between the two books
+        common_genres = len(book_vertex1.genre & book_vertex2.genre)
+
+        # Compute the minimum number of genres between the two books
+        min_num_genres = min(len(book_vertex1.genre), len(book_vertex2.genre))
+
+        # Avoid division by zero
+        if min_num_genres == 0:
+            return 0.0
+
+        # Compute the genre similarity score
+        similarity_score = common_genres / min_num_genres
+
+        return similarity_score
+
+    def highest_genre_similarity(self, book_item: str, num_books: int = 10) -> List[str]:
+        """Get a list of books with the highest genre similarity scores to the specified book.
+
+        Return a list of book items with the highest genre similarity scores to the specified book.
+        """
+        # Retrieve the book vertex corresponding to the given book item
+        book_vertex = self._vertices.get(book_item)
+
+        # If the book is not found in the graph or is not a book vertex, return an empty list
+        if not book_vertex or not isinstance(book_vertex, _Book):
+            return []
+
+        # Initialize a list to store book items with the highest similarity scores
+        similar_books = []
+
+        # Initialize a dictionary to store book items and their similarity scores
+        similarity_scores = {}
+
+        # Iterate over all other book vertices in the graph
+        for other_book_item, other_book_vertex in self._vertices.items():
+            # Skip the same book or non-book vertices
+            if other_book_item == book_item or not isinstance(other_book_vertex, _Book):
+                continue
+
+            # Compute the genre similarity score between the specified book and the other book
+            similarity_score = self.genre_similarity_score(book_item, other_book_item)
+
+            # Store the similarity score for the other book
+            similarity_scores[other_book_item] = similarity_score
+
+        # Sort the dictionary by similarity score in descending order
+        sorted_scores = sorted(similarity_scores.items(), key=lambda x: x[1], reverse=True)
+
+        # Extract the book items from the sorted list
+        for book, _ in sorted_scores[:num_books]:
+            similar_books.append(book)
+
+        # Return the list of book items with the highest similarity scores
+        return similar_books
+
+    def books_by_author(self, author: str, num_books: int = 10) -> List[str]:
+        """Retrieve books by the given author, up to a default of 10.
+
+        Return a list of book items written by the specified author, up to a default of 10.
+        """
+        # Initialize a list to store books by the given author
+        books_by_author = []
+
+        # Initialize a counter to keep track of the number of books found
+        count = 0
+
+        # Iterate over all book vertices in the graph
+        for book_item, book_vertex in self._vertices.items():
+            # Check if the vertex corresponds to a book and if the given author is in the set of authors
+            if isinstance(book_vertex, _Book) and author in book_vertex.author:
+                # Add the book item to the list
+                books_by_author.append(book_item)
+                count += 1
+
+                # If the desired number of books is reached, stop iterating
+                if count >= num_books:
+                    break
+
+        # Return the list of books by the given author
+        return books_by_author
+
+    def most_popular_books(self, num_books: int = 10) -> List[str]:
+        """Find the most popular books based on the ratio of 5-star reviews to total number of reviews.
+
+        Return a list of book items representing the most popular books, up to a default of 10.
+        """
+        # Initialize a list to store book items and their popularity scores
+        book_popularity = []
+
+        # Iterate over all book vertices in the graph
+        for book_item, book_vertex in self._vertices.items():
+            # Check if the vertex corresponds to a book
+            if isinstance(book_vertex, _Book):
+                # Calculate the ratio of 5-star reviews to total number of reviews
+                five_star_reviews = sum(1 for neighbour, rating in book_vertex.neighbours.items() if rating == 5)
+                total_reviews = len(book_vertex.neighbours)
+                popularity_score = five_star_reviews / total_reviews if total_reviews > 0 else 0
+
+                # Append the book item and popularity score to the list
+                book_popularity.append((book_item, popularity_score, total_reviews))
+
+        # Sort the list by popularity score in descending order, with ties broken by total number of reviews
+        book_popularity.sort(key=lambda x: (x[1], x[2]), reverse=True)
+
+        # Extract the book items from the sorted list
+        popular_books = [book[0] for book in book_popularity[:num_books]]
+
+        # Return the list of most popular books
+        return popular_books
 
 
-
-def book_reader(reader: csv.reader) -> dict[str, lst[Union[int, str]]]:
-    """
-    Takes data about books from a file and returns a dictionary 
-    containing book name mapped to a list containing the author's name, number of pages, genre, and summary
-    for them to be added them to a graph.
-    """
-
-    return {line[0]:[line[1], int(line[2]), line[3], line[4]] for line in reader}
+# def load_graph(user_reviews_file: str, book_file: str) -> Graph:
+#     """
+#     Return a book review system as graph corresponding to the given datasets.
+#     Users and Books are the vertices of this graph.
+#
+#     Preconditions:
+#         - user_reviews_file is the path to a CSV file corresponding to the book review data
+#           format
+#         - book_file is the path to a CSV file corresponding to the book data
+#           format
+#     """
+#     # TODO: complete the implementation when user review data is received
+#
+#     gr = Graph()
+#
+#     with open(book_file, 'r') as file:
+#         book_data = csv.reader(file)
+#         # Skipping the header
+#         next(book_data)
+#         book_dict = book_reader(book_data)
+#
+#         for book in book_dict:
+#
+#
+#
+#
+# def book_reader(reader: csv.reader) -> dict[str, lst[Union[int, str]]]:
+#     """
+#     Takes data about books from a file and returns a dictionary
+#     containing book name mapped to a list containing the author's name, number of pages, genre, and summary
+#     for them to be added them to a graph.
+#     """
+#
+#     return {line[0]:[line[1], int(line[2]), line[3], line[4]] for line in reader}
 
 
 if __name__ == '__main__':
