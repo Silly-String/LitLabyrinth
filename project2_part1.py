@@ -216,18 +216,20 @@ class _Book(_Vertex):
     """
     item: str
     kind: str
-    genre: str
-    author: str
+    genre: set[str]
+    author: set[str]
+    pages: int
     blurb: str
     reviews: dict[str, str]
     neighbours: dict[_Vertex, Union[int, float]]
 
-    def __init__(self, item: str, genre: str, author: str, blurb: str = '') -> None:
+    def __init__(self, item: str, pages: int, blurb: str = '') -> None:
         """Initialize a new vertex with the given item and neighbours."""
         super().__init__(item, 'book')
-        self.genre = genre
-        self.author = author
+        self.genre = set()
+        self.author = set()
         self.blurb = blurb
+        self.pages = pages
 
     def average_rating(self) -> Optional[float]:
         """Calculate the average rating for the book based on its reviews.
@@ -235,6 +237,7 @@ class _Book(_Vertex):
         Return None if there are no reviews for the book.
         (use the reviews dictionary)
         """
+        pass
         # TODO: implement
 
 
