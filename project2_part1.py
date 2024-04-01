@@ -719,39 +719,46 @@ class Graph:
         return popular_books
 
 
-# def load_graph(user_reviews_file: str, book_file: str) -> Graph:
-#     """
-#     Return a book review system as graph corresponding to the given datasets.
-#     Users and Books are the vertices of this graph.
-#
-#     Preconditions:
-#         - user_reviews_file is the path to a CSV file corresponding to the book review data
-#           format
-#         - book_file is the path to a CSV file corresponding to the book data
-#           format
-#     """
-#     # TODO: complete the implementation when user review data is received
-#
-#     gr = Graph()
-#
-#     with open(book_file, 'r') as file:
-#         book_data = csv.reader(file)
-#         # Skipping the header
-#         next(book_data)
-#         book_dict = book_reader(book_data)
-#
-#         for book in book_dict:
-#
-#
-#
-#
+def load_graph(user_reviews_file: str, book_file: str) -> Graph:
+    """
+    Return a book review system as graph corresponding to the given datasets.
+    Users and Books are the vertices of this graph.
+
+    Preconditions:
+        - user_reviews_file is the path to a CSV file corresponding to the book review data
+          format
+        - book_file is the path to a CSV file corresponding to the book data
+          format
+    """
+    # TODO: complete the implementation when user review data is received
+
+    gr = Graph()
+
+    with open(book_file, 'r') as file:
+        book_data = csv.reader(file)
+        # Skipping the header
+        next(book_data)
+        for line in book_data:
+            gr.add_vertex(line[0], "user", int(line[3]), line[4])
+            gr[line[0]].author.add(line[2])
+            gr[line[0]].genre.add(line[3])
+
+    with open(user_reviews_file, 'r') as file:
+        user_data = csv.reader(file)
+        next(user_data)
+        for line in user_data:
+            gr.add_vertex(line[0], "user", int(line[3]), line[4])
+            gr[line[0]].author.add(line[2])
+            gr[line[0]].genre.add(line[3])
+
+
 # def book_reader(reader: csv.reader) -> dict[str, lst[Union[int, str]]]:
 #     """
 #     Takes data about books from a file and returns a dictionary
 #     containing book name mapped to a list containing the author's name, number of pages, genre, and summary
 #     for them to be added them to a graph.
 #     """
-#
+
 #     return {line[0]:[line[1], int(line[2]), line[3], line[4]] for line in reader}
 
 
