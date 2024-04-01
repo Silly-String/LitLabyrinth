@@ -281,7 +281,7 @@ class Graph:
         """Initialize an empty graph (no vertices or edges)."""
         self._vertices = {}
 
-    def add_vertex(self, item: Any, kind: str, pages: Optional[int] = None, blurb: Optional[str] = None) -> None:
+    def add_vertex(self, item: Any, kind: str, pages: Optional[int] = None, genre: Optional[str] = None, blurb: Optional[str] = None) -> None:
         """Add a vertex with the given item and kind to this graph.
 
         The new vertex is not adjacent to any other vertices.
@@ -292,7 +292,7 @@ class Graph:
         """
         if item not in self._vertices:
             if kind == 'book':
-                self._vertices[item] = _Book(item, pages, blurb)
+                self._vertices[item] = _Book(item, pages, genre, blurb)
             elif kind == 'user':
                 self._vertices[item] = _User(item)
             else:
