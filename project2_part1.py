@@ -21,6 +21,8 @@ from __future__ import annotations
 from typing import Any, List, Optional, Union
 import csv
 
+import networkx as nx
+
 
 # TODO: a lot of this module is copy pasted, so just check each one to make sure the implementations fit
 #  the changes we've made to our class attributes, and check the docstrings for the same
@@ -158,8 +160,7 @@ class _Vertex:
         similarity score for _Vertex (from Exercise 3). That is, just look at edges,
         and ignore the weights.
         """
-        # TODO: check docstring and remove anything refering to the handout.
-        #  Replace with additional details or omit entirely
+        # TODO: check function docstring
         if self.degree() == 0 or other.degree() == 0:
             return 0
 
@@ -180,8 +181,7 @@ class _Vertex:
 
         See Exercise handout for details.
         """
-        # TODO: check docstring and remove anything refering to the handout.
-        #  Replace with additional details or omit entirely
+        # TODO: check function docstring
         if self.degree() == 0 or other.degree() == 0:
             return 0
 
@@ -239,11 +239,16 @@ class _Book(_Vertex):
         Return None if there are no reviews for the book.
         (use the 'reviews' dictionary)
         """
-        # TODO: implement
-        # checks if there are no reviews and returns None if there are none
-        if self.neighbours == {}:
-            return None
         total_rating = 0
+        num_reviews = len(self.neighbours)
+
+        if num_reviews == 0:
+            return None
+
+        for _, rating in self.neighbours.items():
+            total_rating += rating
+
+        return total_rating / num_reviews
 
 
 class _User(_Vertex):
@@ -344,7 +349,7 @@ class Graph:
             v = self._vertices[item]
             return {neighbour.item for neighbour in v.neighbours}
         else:
-            raise ValueError
+            raise ValueError("This item is not in the graph")
 
     def get_all_items(self, kind: str = '') -> set:
         """Return a set of all vertex items in this graph.
@@ -379,8 +384,7 @@ class Graph:
         Return None if no such path exists, including when item1 or item2
         do not appear as vertices in this graph.
         """
-        # TODO: adjust code to fit the specifications for our version of the vertex/graph class
-        #  (dependent on an unadjusted method above in the vertex class)
+        # TODO: check function docstring
         if item1 in self._vertices and item2 in self._vertices:
             v1 = self._vertices[item1]
             return v1.check_connected_path(item2, set())
@@ -395,8 +399,7 @@ class Graph:
         Preconditions:
             - d >= 0
         """
-        # TODO: adjust code to fit the specifications for our version of the vertex/graph class
-        #  (dependent on an unadjusted method above in the vertex class)
+        # TODO: check function docstring
         if item1 in self._vertices and item2 in self._vertices:
             v1 = self._vertices[item1]
             return v1.check_connected_distance(item2, set(), d)
@@ -734,6 +737,30 @@ class Graph:
 
         # Return the list of most popular books
         return popular_books
+
+    def to_networkx(self, max_vertices: int = 5000) -> nx.Graph:
+        """Convert this graph into a networkx Graph.
+
+        max_vertices specifies the maximum number of vertices that can appear in the graph.
+        (This is necessary to limit the visualization output for large graphs.)
+
+        Note that this method is provided for you, and you shouldn't change it.
+        """
+        graph_nx = nx.Graph()
+        for v in self._vertices.values():
+            graph_nx.add_node(v.item, kind=v.kind)
+
+            for u in v.neighbours:
+                if graph_nx.number_of_nodes() < max_vertices:
+                    graph_nx.add_node(u.item, kind=u.kind)
+
+                if u.item in graph_nx.nodes:
+                    graph_nx.add_edge(v.item, u.item)
+
+            if graph_nx.number_of_nodes() >= max_vertices:
+                break
+
+        return graph_nx
 
 
 def load_graph(user_reviews_file: str, book_file: str) -> Graph:
