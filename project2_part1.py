@@ -76,10 +76,10 @@ class _Vertex:
         Preconditions:
             - self not in visited
 
-        >>> v1 = _Vertex(1, set())
-        >>> v2 = _Vertex(2, set())
-        >>> v3 = _Vertex(3, set())
-        >>> v4 = _Vertex(4, set())
+        >>> v1 = _Vertex(1, 'book')
+        >>> v2 = _Vertex(2, 'book')
+        >>> v3 = _Vertex(3, 'book')
+        >>> v4 = _Vertex(4, 'book')
         >>> v1.neighbours = {v2, v3}
         >>> v2.neighbours = {v4}
         >>> v1.check_connected_path(4, set())
@@ -110,11 +110,11 @@ class _Vertex:
             - self not in visited
             - d >= 0
 
-        >>> v1 = _Vertex(1, set())
-        >>> v2 = _Vertex(2, set())
-        >>> v3 = _Vertex(3, set())
-        >>> v4 = _Vertex(4, set())
-        >>> v5 = _Vertex(5, set())
+        >>> v1 = _Vertex(1, 'book')
+        >>> v2 = _Vertex(2, 'book')
+        >>> v3 = _Vertex(3, 'book')
+        >>> v4 = _Vertex(4, 'book')
+        >>> v5 = _Vertex(5, 'book')
         >>> v1.neighbours = {v2, v3}
         >>> v2.neighbours = {v3}
         >>> v3.neighbours = {v4}
@@ -216,6 +216,7 @@ class _Book(_Vertex):
     Representation Invariants:
         - self not in self.neighbours
         - all(self in u.neighbours for u in self.neighbours)
+        - self.reviews is None and self.neighbours is None
     """
     item: str
     kind: str
@@ -241,6 +242,11 @@ class _Book(_Vertex):
         (use the reviews dictionary)
         """
         # TODO: implement
+        # checks if there are no reviews and returns None if there are none
+        if self.neighbours == {}:
+            return None
+        total_rating = 0
+
 
 
 class _User(_Vertex):
@@ -345,9 +351,9 @@ class Graph:
 
     def get_all_items(self, kind: str = '') -> set:
         """Return a set of all vertex items in this graph.
-    
+
         If kind != '', only return the items of the given vertex kind.
-    
+
         Preconditions:
             - kind in {'', 'user', 'book'}
         """
@@ -737,7 +743,7 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
     """
     Return a book review system as graph corresponding to the given datasets.
     Users and Books are the vertices of this graph.
-    
+
 
     Preconditions:
         - user_reviews_file is the path to a CSV file corresponding to the book review data
@@ -767,9 +773,9 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
                 if vert.item == line[0]:
                     vert.reviews[line[1]] = line[3]
             gr.add_edge(line[0], line[1], int(line[2]))
-            
+
     return gr
-    
+
 
 if __name__ == '__main__':
     import doctest
