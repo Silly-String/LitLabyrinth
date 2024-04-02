@@ -51,7 +51,8 @@ class _Vertex:
     neighbours: dict[_Vertex, Union[int, float]]
 
     def __init__(self, item: Any, kind: str) -> None:
-        """Initialize a new vertex with the given item and neighbours."""
+        """Initialize a new vertex with the given item and kind.
+        self.reviews and self.neighbours is automatically set to an empty dictionary."""
         self.item = item
         self.kind = kind
         self.reviews = {}
@@ -110,16 +111,13 @@ class _Vertex:
             - self not in visited
             - d >= 0
 
-        >>> v1 = _Vertex(1, 'book')
-        >>> v2 = _Vertex(2, 'book')
-        >>> v3 = _Vertex(3, 'book')
-        >>> v4 = _Vertex(4, 'book')
-        >>> v5 = _Vertex(5, 'book')
-        >>> v1.neighbours = {v2, v3}
-        >>> v2.neighbours = {v3}
-        >>> v3.neighbours = {v4}
-        >>> v4.neighbours = {v5}
-        >>> v1.check_connected_distance(5, set(), 3)  # Returns True: v1, v3, v4, v5
+        >>> b1 = _Book("Nush On the Shore", 7)
+        >>> u2 = _User("ala")
+        >>> b3 = _Book("Nelle On the Shore", 8)
+        >>> u4 = _User("illy")
+        >>> b1.neighbours = {u2: 3, u4: 5}
+        >>> u2.neighbours = {b3: ""}
+        >>> b1.check_connected_distance("Nelle On the Shore", set(), 3)  # Returns True: v1, v3, v4, v5
         True
 
         Implementation note (IMPORTANT):
@@ -139,8 +137,8 @@ class _Vertex:
               This is subtle because this error would only happen if we make the first recursive
               call on v2---if we recurse on v3, the doctest would pass!
         """
-        # TODO: adjust code to fit the specifications for our version of the vertex class
-        if d == 0 and self.item == target_item:
+        # TODO: check function docstring
+        if d >= 0 and self.item == target_item:
             return True
 
         elif d > 0:
@@ -239,7 +237,7 @@ class _Book(_Vertex):
         """Calculate the average rating for the book based on its reviews.
 
         Return None if there are no reviews for the book.
-        (use the reviews dictionary)
+        (use the 'reviews' dictionary)
         """
         # TODO: implement
         # checks if there are no reviews and returns None if there are none
