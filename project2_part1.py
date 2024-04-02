@@ -76,18 +76,18 @@ class _Vertex:
         Preconditions:
             - self not in visited
 
-        >>> v1 = _Vertex(1, 'book')
-        >>> v2 = _Vertex(2, 'book')
-        >>> v3 = _Vertex(3, 'book')
-        >>> v4 = _Vertex(4, 'book')
-        >>> v1.neighbours = {v2, v3}
-        >>> v2.neighbours = {v4}
-        >>> v1.check_connected_path(4, set())
-        [1, 2, 4]
-        >>> v1.check_connected_path(4, {v2}) is None
+        >>> b1 = _Book("Nush On the Shore", 7)
+        >>> u2 = _User("ala")
+        >>> b3 = _Book("Nelle On the Shore", 8)
+        >>> u4 = _User("illy")
+        >>> b1.neighbours = {u2: 3, u4: 5}
+        >>> u2.neighbours = {b3: ""}
+        >>> b1.check_connected_path("Nelle On the Shore", set())
+        ['Nush On the Shore', 'ala', 'Nelle On the Shore']
+        >>> b1.check_connected_path("Nelle On the Shore", {u2}) is None
         True
         """
-        # TODO: adjust code to fit the specifications for our version of the vertex class
+        # TODO: check function docstring
         if self.item == target_item:
             return [self.item]
 
