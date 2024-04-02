@@ -19,6 +19,7 @@ This file is Copyright (c) 2024 CSC111 Teaching Team
 """
 from __future__ import annotations
 from typing import Any, List, Optional, Union
+import csv
 
 
 # TODO: a lot of this module is copy pasted, so just check each one to make sure the implementations fit
@@ -342,7 +343,7 @@ class Graph:
         else:
             raise ValueError
 
-    def get_all_vertices(self, kind: str = '') -> set:
+        def get_all_items(self, kind: str = '') -> set:
         """Return a set of all vertex items in this graph.
 
         If kind != '', only return the items of the given vertex kind.
@@ -354,6 +355,19 @@ class Graph:
             return {v.item for v in self._vertices.values() if v.kind == kind}
         else:
             return set(self._vertices.keys())
+
+    def get_all_vertices(self, kind: str = '') -> set:
+        """Return a set of all vertices in this graph.
+
+        If kind != '', only return the vertices of the given kind.
+
+        Preconditions:
+            - kind in {'', 'user', 'book'}
+        """
+        if kind != '':
+            return {v for v in self._vertices.values() if v.kind == kind}
+        else:
+            return set(self._vertices.values())
 
     def connected_path(self, item1: Any, item2: Any) -> Optional[list]:
         """Return a path between item1 and item2 in this graph.
@@ -731,8 +745,6 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
         - book_file is the path to a CSV file corresponding to the book data
           format
     """
-    # TODO: complete the implementation when user revies datatypep is confirmed
-
     gr = Graph()
 
     with open(book_file, 'r') as file:
@@ -740,21 +752,24 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
         # Skipping the header
         next(book_data)
         for line in book_data:
-            gr.add_vertex(line[0], "book", int(line[3]), line[4])
-            gr[line[0]].author.add(line[2])
-            gr[line[0]].genre.add(line[3])
+            gr.add_vertex(item=line[0], kind="book", pages=int(line[3]), blurb=line[4])
+            for vert in gr.get_all_vertices("book"):
+                if vert.item == line[0]:
+                    vert.author.add(line[2])
+                    vert.genre.add(line[3])
 
     with open(user_reviews_file, 'r') as file:
         user_data = csv.reader(file)
         next(user_data)
         for line in user_data:
-            gr.add_vertex(line[0], "user")
-            review = {line[1]: line[3]}
-            gr[line[0]].reviews[line[1]] = line[3]
+            gr.add_vertex(item=line[0], kind="user")
+            for vert in gr.get_all_vertices("user"):
+                if vert.item == line[0]:
+                    vert.reviews[line[1]] = line[3]
             gr.add_edge(line[0], line[1], int(line[2]))
             
-
-
+    return gr
+    
 
 if __name__ == '__main__':
     import doctest
