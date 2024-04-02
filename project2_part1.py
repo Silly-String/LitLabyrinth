@@ -248,7 +248,6 @@ class _Book(_Vertex):
         total_rating = 0
 
 
-
 class _User(_Vertex):
     """A vertex in a graph.
 
@@ -722,7 +721,7 @@ class Graph:
             # Check if the vertex corresponds to a book
             if isinstance(book_vertex, _Book):
                 # Calculate the ratio of 5-star reviews to total number of reviews
-                five_star_reviews = sum(1 for neighbour, rating in book_vertex.neighbours.items() if rating == 5)
+                five_star_reviews = sum(1 for _, rating in book_vertex.neighbours.items() if rating == 5)
                 total_reviews = len(book_vertex.neighbours)
                 popularity_score = five_star_reviews / total_reviews if total_reviews > 0 else 0
 
@@ -758,21 +757,37 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
         # Skipping the header
         next(book_data)
         for line in book_data:
-            gr.add_vertex(item=line[0], kind="book", pages=int(line[3]), blurb=line[4])
+            book_title = line[0]
+            authors = [author.strip() for author in line[1].split(',')]
+            pages = int(line[2])
+            genres = [genre.strip() for genre in line[3].split(',')]
+            summary = line[4]
+
+            gr.add_vertex(item=book_title, kind="book", pages=pages, blurb=summary)
             for vert in gr.get_all_vertices("book"):
-                if vert.item == line[0]:
-                    vert.author.add(line[2])
-                    vert.genre.add(line[3])
+                if vert.item == book_title:
+                    vert.author.update(authors)
+                    vert.genre.update(genres)
 
     with open(user_reviews_file, 'r') as file:
         user_data = csv.reader(file)
+        # Skipping the header
         next(user_data)
         for line in user_data:
-            gr.add_vertex(item=line[0], kind="user")
+            user_id = line[0]
+            book_title = line[1]
+            review = line[3]
+            rating = int(line[2])
+
+            gr.add_vertex(item=user_id, kind="user")
             for vert in gr.get_all_vertices("user"):
-                if vert.item == line[0]:
-                    vert.reviews[line[1]] = line[3]
-            gr.add_edge(line[0], line[1], int(line[2]))
+                if vert.item == user_id:
+                    vert.reviews[book_title] = review
+                    # Update the book's review dictionary
+                    for book_vertex in gr.get_all_vertices("book"):
+                        if book_vertex.item == book_title:
+                            book_vertex.reviews[user_id] = review
+            gr.add_edge(user_id, book_title, rating)
 
     return gr
 
