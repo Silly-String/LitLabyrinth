@@ -133,38 +133,14 @@ class _Vertex:
               call on v2---if we recurse on v3, the doctest would pass!
         """
         # TODO: check function docstring
-        # if d >= 0 and self.item == target_item:
-        #     return True
-        #
-        # elif d > 0:
-        #     new_visited = visited.union({self})
-        #
-        #     for neighbour in self.neighbours:
-        #         if neighbour not in new_visited:
-        #             if neighbour.check_connected_distance(target_item, new_visited, d - 1):
-        #                 return True
-        #
-        # return False
-        if self == target_item:
+        if d >= 0 and self.item == target_item:
             return True
 
-        if d <= 0:
-            return False
+        elif d > 0:
+            new_visited = visited.union({self})
 
-        if self in visited:
-            return False
-
-        return self._check_neighbours(target_item, visited, d)
-
-    def _check_neighbours(self, target_item: _Vertex, visited: set[_Vertex], d: int) -> bool:
-        """
-        Helper function to check neighbours recursively.
-        """
-        new_visited = visited.union({self})
-
-        for neighbour in self.neighbours:
-            if neighbour not in new_visited:
-                if neighbour.check_connected_distance(target_item, new_visited, d - 1):
+            for neighbour in self.neighbours:
+                if neighbour not in new_visited and neighbour.check_connected_distance(target_item, new_visited, d - 1):
                     return True
 
         return False
@@ -904,7 +880,7 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
             genres = [genre.strip() for genre in line[3].split(',')]
             summary = line[4]
 
-            _add_book_to_graph(gr, book_title, authors, pages, genres, summary)
+            _add_book_to_graph(gr, (book_title, pages), authors, genres, summary)
 
     with open(user_reviews_file, 'r') as file:
         user_data = csv.reader(file)
@@ -921,25 +897,24 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
     return gr
 
 
-def _add_book_to_graph(graph: Graph, book_title: str, authors: List[str], pages: int, genres: List[str],
+def _add_book_to_graph(graph: Graph, book_title_pages: tuple[str, int], authors: List[str], genres: List[str],
                        summary: str) -> None:
     """
     Add book information to the graph.
 
     Args:
-        graph (Graph): The graph object to which the book information will be added.
-        book_title (str): The title of the book.
-        authors (List[str]): List of authors of the book.
-        pages (int): Number of pages in the book.
-        genres (List[str]): List of genres associated with the book.
-        summary (str): Summary or blurb of the book.
+        - graph (Graph): The graph object to which the book information will be added.
+        - book_title_pages tuple[str, int]: The title of the book, coupled with the page count.
+        - authors (List[str]): List of authors of the book.
+        - genres (List[str]): List of genres associated with the book.
+        - summary (str): Summary or blurb of the book.
 
     Returns:
-        None
+        - None
     """
-    graph.add_vertex(item=book_title, kind="book", pages=pages, blurb=summary)
+    graph.add_vertex(item=book_title_pages[0], kind="book", pages=book_title_pages[1], blurb=summary)
     for vert in graph.get_all_vertices("book"):
-        if vert.item == book_title:
+        if vert.item == book_title_pages[0]:
             vert.author.update(authors)
             vert.genre.update(genres)
 
@@ -949,24 +924,39 @@ def _add_user_review_to_graph(graph: Graph, user_id: str, book_title: str, revie
     Add user review information to the graph.
 
     Args:
-        graph (Graph): The graph object to which the user review information will be added.
-        user_id (str): The ID of the user.
-        book_title (str): The title of the book being reviewed.
-        review (str): The review text.
-        rating (int): The rating given by the user.
+        - graph (Graph): The graph object to which the user review information will be added.
+        - user_id (str): The ID of the user.
+        - book_title (str): The title of the book being reviewed.
+        - review (str): The review text.
+        - rating (int): The rating given by the user.
 
     Returns:
-        None
+        - None
     """
     graph.add_vertex(item=user_id, kind="user")
     for vert in graph.get_all_vertices("user"):
         if vert.item == user_id:
             vert.reviews[book_title] = review
-            # Update the book's review dictionary
-            for book_vertex in graph.get_all_vertices("book"):
-                if book_vertex.item == book_title:
-                    book_vertex.reviews[user_id] = review
+            _update_book_reviews(graph, book_title, user_id, review)
     graph.add_edge(user_id, book_title, rating)
+
+
+def _update_book_reviews(graph: Graph, book_title: str, user_id: str, review: str) -> None:
+    """
+    Update the review dictionary of a book vertex with a new user review.
+
+    Args:
+        graph (Graph): The graph object containing the book vertex.
+        book_title (str): The title of the book being reviewed.
+        user_id (str): The ID of the user who provided the review.
+        review (str): The review text.
+
+    Returns:
+        None
+    """
+    for book_vertex in graph.get_all_vertices("book"):
+        if book_vertex.item == book_title:
+            book_vertex.reviews[user_id] = review
 
 
 if __name__ == '__main__':
