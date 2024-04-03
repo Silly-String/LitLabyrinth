@@ -456,12 +456,13 @@ class Graph:
         book_vertex = self._vertices.get(book_item)
         if isinstance(book_vertex, _Book):
             book_info = {
-                        'title': book_vertex.item,
-                        'genre': ', '.join(book_vertex.genre),
-                        'author': ', '.join(book_vertex.author),
-                        'blurb': book_vertex.blurb,
-                        'average_rating': self.average_rating_for_book(book_item)
-                    }
+                'title': book_vertex.item,
+                'author': ', '.join(book_vertex.author)
+                'genre': ', '.join(book_vertex.genre),
+                'blurb': book_vertex.blurb,
+                'average_rating': self.average_rating_for_book(book_item),
+                'pages': book_vertex.pages
+            }
             # If info_type is specified, return the requested piece of information
             if info_type:
                 return book_info.get(info_type, "Invalid info type specified.")
