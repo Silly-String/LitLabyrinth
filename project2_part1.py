@@ -24,14 +24,7 @@ import csv
 import networkx as nx
 
 
-# TODO: a lot of this module is copy pasted, so just check each one to make sure the implementations fit
-#  the changes we've made to our class attributes, and check the docstrings for the same
-#  reason (as well as to remove things like  "check the handout for..."). And especially keep an eye out for
-#  set methods being used on a dict. That was one of the changes we made for this project and it's probably going to
-#  pop up a lot
-#  Most fo these jsut need to be double checked to make sure nothing got missed and tha tthe implemetations make sense.
-#  When you run it with PyTA, if the functions ay too many nested whatever, see if something inside it can be broken
-#  down into a vertex function
+# TODO: fix PyTA errors and docstrings
 
 class _Vertex:
     """A vertex in a graph.
@@ -576,7 +569,7 @@ class Graph:
         return filtered_books
 
     def get_book_recommendations(self, liked_books: List[Any], min_rating: Optional[int] = None,
-                                 max_books: Optional[int] = 10) -> Union[str, list]:
+                                 max_books: Optional[int] = 5) -> Union[str, dict[str, list]]:
         """Get book recommendations based on a list of liked books.
 
         Given a list of liked_books, find books that share features with those liked books.
@@ -585,11 +578,31 @@ class Graph:
         Limit the maximum number of recommended books returned to max_books, with a default of 10 unless otherwise
         specified.
         """
-        # TODO: implement
-        #  I'm not 100% sure how to go about the implementation of this one, so if it gets too much, we can scrap it.
-        #  This would be the function for the main recomending feature of our project, but we still have a bunch of
-        #  other festures, so loosing one won't hurt too much.
-        #  I know this is a tough one so I tried to get some of the other functions out of the way.
+        if not liked_books:
+            return "No liked books provided."
+
+        recommendations = {'books with similar genre': [], 'books with similar author': []}
+
+        for book in liked_books:
+            genre_similar_books = self.highest_genre_similarity(book, 20)
+            author_similar_books = self.highest_author_similarity(book, 20)
+
+            # Filter by minimum rating if provided
+            if min_rating is not None:
+                genre_similar_books = [b for b in genre_similar_books
+                                       if self.average_rating_for_book(book) >= min_rating]
+                author_similar_books = [b for b in author_similar_books
+                                        if self.average_rating_for_book(book) >= min_rating]
+
+            # Limit the number of recommended books
+            genre_similar_books = genre_similar_books[:max_books]
+            author_similar_books = author_similar_books[:max_books]
+
+            # Add recommendations to the dictionary
+            recommendations['books with similar genre'].append(genre_similar_books)
+            recommendations['books with similar author'].append(author_similar_books)
+
+        return recommendations
 
     def find_books_by_genre(self, genre: str, max_books: Optional[int] = 10) -> list:
         """Find books based on the specified genre.
@@ -669,6 +682,74 @@ class Graph:
 
             # Compute the genre similarity score between the specified book and the other book
             similarity_score = self.genre_similarity_score(book_item, other_book_item)
+
+            # Store the similarity score for the other book
+            similarity_scores[other_book_item] = similarity_score
+
+        # Sort the dictionary by similarity score in descending order
+        sorted_scores = sorted(similarity_scores.items(), key=lambda x: x[1], reverse=True)
+
+        # Extract the book items from the sorted list
+        for book, _ in sorted_scores[:num_books]:
+            similar_books.append(book)
+
+        # Return the list of book items with the highest similarity scores
+        return similar_books
+
+    def author_similarity_score(self, book_item1: Any, book_item2: Any) -> float:
+        """Compute the author similarity score between two books.
+
+        Return a score representing the similarity of authors between the two books.
+        The score is computed as the number of common authors divided by the minimum number of authors between the two
+        books.
+        """
+        # Retrieve the book vertices corresponding to the given book items
+        book_vertex1 = self._vertices.get(book_item1)
+        book_vertex2 = self._vertices.get(book_item2)
+
+        # If either book is not found in the graph or is not a book vertex, return 0
+        if (not book_vertex1 or not book_vertex2 or not isinstance(book_vertex1, _Book)
+                or not isinstance(book_vertex2, _Book)):
+            return 0.0
+
+        # Compute the number of common authors between the two books
+        common_authors = len(book_vertex1.author & book_vertex2.author)
+
+        # Compute the minimum number of authors between the two books
+        min_num_authors = min(len(book_vertex1.author), len(book_vertex2.author))
+
+        # Avoid division by zero
+        if min_num_authors == 0:
+            return 0.0
+
+        return common_authors / min_num_authors
+
+    def highest_author_similarity(self, book_item: str, num_books: int = 10) -> List[str]:
+        """Get a list of books with the highest author similarity scores to the specified book.
+
+        Return a list of book items with the highest author similarity scores to the specified book.
+        """
+        # Retrieve the book vertex corresponding to the given book item
+        book_vertex = self._vertices.get(book_item)
+
+        # If the book is not found in the graph or is not a book vertex, return an empty list
+        if not book_vertex or not isinstance(book_vertex, _Book):
+            return []
+
+        # Initialize a list to store book items with the highest similarity scores
+        similar_books = []
+
+        # Initialize a dictionary to store book items and their similarity scores
+        similarity_scores = {}
+
+        # Iterate over all other book vertices in the graph
+        for other_book_item, other_book_vertex in self._vertices.items():
+            # Skip the same book or non-book vertices
+            if other_book_item == book_item or not isinstance(other_book_vertex, _Book):
+                continue
+
+            # Compute the author similarity score between the specified book and the other book
+            similarity_score = self.author_similarity_score(book_item, other_book_item)
 
             # Store the similarity score for the other book
             similarity_scores[other_book_item] = similarity_score
