@@ -24,7 +24,7 @@ import csv
 import networkx as nx
 
 
-# TODO: fix PyTA errors and docstrings
+# TODO: fix PyTA errors and docstring
 
 class _Vertex:
     """A vertex in a graph.
@@ -523,12 +523,7 @@ class Graph:
             if isinstance(book_vertex, _Book):
                 if book_vertex.reviews:
                     reviews_list = list(book_vertex.reviews.items())
-
-                    # Limit the number of reviews if max_reviews is specified
-                    if max_reviews is not None:
-                        reviews_list = reviews_list[:max_reviews]
-
-                    formatted_reviews = "\n".join([f"{user}: {review}" for user, review in reviews_list])
+                    formatted_reviews = _format_reviews(reviews_list, max_reviews)
                     return formatted_reviews
                 else:
                     return "No reviews available for this book."
@@ -713,7 +708,7 @@ class Graph:
         sorted_scores = sorted(similarity_scores.items(), key=lambda x: x[1], reverse=True)
 
         # Extract the book items from the sorted list
-        for book, _ in sorted_scores[:num_books]:
+        for book, _unused_item in sorted_scores[:num_books]:
             similar_books.append(book)
 
         # Return the list of book items with the highest similarity scores
@@ -781,7 +776,7 @@ class Graph:
         sorted_scores = sorted(similarity_scores.items(), key=lambda x: x[1], reverse=True)
 
         # Extract the book items from the sorted list
-        for book, _ in sorted_scores[:num_books]:
+        for book, _unused_item in sorted_scores[:num_books]:
             similar_books.append(book)
 
         # Return the list of book items with the highest similarity scores
@@ -867,6 +862,23 @@ class Graph:
         return graph_nx
 
 
+def _format_reviews(reviews_list: list, max_reviews: Optional[int]) -> str:
+    """Format the list of reviews.
+
+    Args:
+        reviews_list (list): List of tuples containing user and review.
+        max_reviews (int, optional): Maximum number of reviews to include.
+
+    Returns:
+        str: Formatted reviews string.
+    """
+    if max_reviews is not None:
+        reviews_list = reviews_list[:max_reviews]
+
+    formatted_reviews = "\n".join([f"{user}: {review}" for user, review in reviews_list])
+    return formatted_reviews
+
+
 def load_graph(user_reviews_file: str, book_file: str) -> Graph:
     """
     Return a book review system as graph corresponding to the given datasets.
@@ -892,11 +904,7 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
             genres = [genre.strip() for genre in line[3].split(',')]
             summary = line[4]
 
-            gr.add_vertex(item=book_title, kind="book", pages=pages, blurb=summary)
-            for vert in gr.get_all_vertices("book"):
-                if vert.item == book_title:
-                    vert.author.update(authors)
-                    vert.genre.update(genres)
+            _add_book_to_graph(gr, book_title, authors, pages, genres, summary)
 
     with open(user_reviews_file, 'r') as file:
         user_data = csv.reader(file)
@@ -908,17 +916,57 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
             review = line[3]
             rating = int(line[2])
 
-            gr.add_vertex(item=user_id, kind="user")
-            for vert in gr.get_all_vertices("user"):
-                if vert.item == user_id:
-                    vert.reviews[book_title] = review
-                    # Update the book's review dictionary
-                    for book_vertex in gr.get_all_vertices("book"):
-                        if book_vertex.item == book_title:
-                            book_vertex.reviews[user_id] = review
-            gr.add_edge(user_id, book_title, rating)
+            _add_user_review_to_graph(gr, user_id, book_title, review, rating)
 
     return gr
+
+
+def _add_book_to_graph(graph: Graph, book_title: str, authors: List[str], pages: int, genres: List[str],
+                       summary: str) -> None:
+    """
+    Add book information to the graph.
+
+    Args:
+        graph (Graph): The graph object to which the book information will be added.
+        book_title (str): The title of the book.
+        authors (List[str]): List of authors of the book.
+        pages (int): Number of pages in the book.
+        genres (List[str]): List of genres associated with the book.
+        summary (str): Summary or blurb of the book.
+
+    Returns:
+        None
+    """
+    graph.add_vertex(item=book_title, kind="book", pages=pages, blurb=summary)
+    for vert in graph.get_all_vertices("book"):
+        if vert.item == book_title:
+            vert.author.update(authors)
+            vert.genre.update(genres)
+
+
+def _add_user_review_to_graph(graph: Graph, user_id: str, book_title: str, review: str, rating: int) -> None:
+    """
+    Add user review information to the graph.
+
+    Args:
+        graph (Graph): The graph object to which the user review information will be added.
+        user_id (str): The ID of the user.
+        book_title (str): The title of the book being reviewed.
+        review (str): The review text.
+        rating (int): The rating given by the user.
+
+    Returns:
+        None
+    """
+    graph.add_vertex(item=user_id, kind="user")
+    for vert in graph.get_all_vertices("user"):
+        if vert.item == user_id:
+            vert.reviews[book_title] = review
+            # Update the book's review dictionary
+            for book_vertex in graph.get_all_vertices("book"):
+                if book_vertex.item == book_title:
+                    book_vertex.reviews[user_id] = review
+    graph.add_edge(user_id, book_title, rating)
 
 
 if __name__ == '__main__':
