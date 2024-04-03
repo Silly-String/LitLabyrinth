@@ -133,16 +133,39 @@ class _Vertex:
               call on v2---if we recurse on v3, the doctest would pass!
         """
         # TODO: check function docstring
-        if d >= 0 and self.item == target_item:
+        # if d >= 0 and self.item == target_item:
+        #     return True
+        #
+        # elif d > 0:
+        #     new_visited = visited.union({self})
+        #
+        #     for neighbour in self.neighbours:
+        #         if neighbour not in new_visited:
+        #             if neighbour.check_connected_distance(target_item, new_visited, d - 1):
+        #                 return True
+        #
+        # return False
+        if self == target_item:
             return True
 
-        elif d > 0:
-            new_visited = visited.union({self})
+        if d <= 0:
+            return False
 
-            for neighbour in self.neighbours:
-                if neighbour not in new_visited:
-                    if neighbour.check_connected_distance(target_item, new_visited, d - 1):
-                        return True
+        if self in visited:
+            return False
+
+        return self._check_neighbours(target_item, visited, d)
+
+    def _check_neighbours(self, target_item: _Vertex, visited: set[_Vertex], d: int) -> bool:
+        """
+        Helper function to check neighbours recursively.
+        """
+        new_visited = visited.union({self})
+
+        for neighbour in self.neighbours:
+            if neighbour not in new_visited:
+                if neighbour.check_connected_distance(target_item, new_visited, d - 1):
+                    return True
 
         return False
 
@@ -238,7 +261,7 @@ class _Book(_Vertex):
         if num_reviews == 0:
             return None
 
-        for _, rating in self.neighbours.items():
+        for rating in self.neighbours.values():
             total_rating += rating
 
         return total_rating / num_reviews
