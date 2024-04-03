@@ -57,15 +57,14 @@ class _Vertex:
 
     def check_connected_path(self, target_item: Any, visited: set[_Vertex]) -> Optional[list]:
         """Return a path between self and the vertex corresponding to the target_item,
-        WITHOUT using any of the vertices in visited.
+        without using any of the vertices in visited.
 
-        The returned list contains the ITEMS stored in the _Vertex objects, not the _Vertex
+        The returned list contains the items stored in the _Vertex objects, not the _Vertex
         objects themselves. The first list element is self.item, and the last is target_item.
         If there is more than one such path, any of the paths is returned.
 
         Return None if no such path exists (i.e., if self is not connected to a vertex with
-        the target_item). Note that this is very similar to _Vertex.check_connected, except
-        this method returns an Optional[list] instead of a bool.
+        the target_item).
 
         Preconditions:
             - self not in visited
@@ -98,7 +97,7 @@ class _Vertex:
 
     def check_connected_distance(self, target_item: Any, visited: set[_Vertex], d: int) -> bool:
         """Return whether this vertex is connected to a vertex corresponding to the target_item,
-        WITHOUT using any of the vertices in visited, by a path of length <= d.
+        without using any of the vertices in visited, by a path of length <= d.
 
         Preconditions:
             - self not in visited
@@ -112,23 +111,6 @@ class _Vertex:
         >>> u2.neighbours = {b3: ""}
         >>> b1.check_connected_distance("Nelle On the Shore", set(), 3)  # Returns True: v1, v3, v4, v5
         True
-
-        Implementation note (IMPORTANT):
-            - Unlike check_connected, you should NOT mutate visited here (but instead
-              create a new set that adds self, using set.union for example).
-              This is less efficient, but also required to not introduce bugs.
-              (Keep reading for details, but it's not required for implementing this method.)
-
-              To see why, consider the doctest example.
-              Since v1 has two neighbours (v2 and v3) stored in a set, the choice of which
-              one to recurse on first is up to the Python interpreter. If we recurse on
-              v2 first, then that recursive call will return False (since the path
-              v1, v2, v3, v4, v5 is too long). But if we have every recursive call mutate
-              visited, then when we're back to the original call v1.check_connected_distance,
-              the loop will skip over v3, and fail to "find" the path v1, v3, v4, v5.
-
-              This is subtle because this error would only happen if we make the first recursive
-              call on v2---if we recurse on v3, the doctest would pass!
         """
         # TODO: check function docstring
         if d >= 0 and self.item == target_item:
@@ -146,9 +128,10 @@ class _Vertex:
     def similarity_score_unweighted(self, other: _Vertex) -> float:
         """Return the unweighted similarity score between this vertex and other.
 
-        The unweighted similarity score is calculated in the same way as the
-        similarity score for _Vertex (from Exercise 3). That is, just look at edges,
-        and ignore the weights.
+        The unweighted similarity score is calculated by dividing the total number of neighbours that are
+        adjacent to both the vertices by the total number of neighbours that are adjacent to either one or
+        both  of them. In the case that the degree of either vertex is found to be 0, the unweighted 
+        similarity score is computed as 0.
         """
         # TODO: check function docstring
         if self.degree() == 0 or other.degree() == 0:
@@ -168,8 +151,12 @@ class _Vertex:
 
     def similarity_score_strict(self, other: _Vertex) -> float:
         """Return the strict weighted similarity score between this vertex and other.
-
-        See Exercise handout for details.
+        This function calculates the similarity score in a similar manner as the function
+        similarity_score_unweighted; however, the numerator only counts common neighbours 
+        that have the same weight on the corresponding edges. When comparing two books, 
+        this means we only count the common users that gave the books the exact same 
+        review score.
+        
         """
         # TODO: check function docstring
         if self.degree() == 0 or other.degree() == 0:
@@ -227,7 +214,6 @@ class _Book(_Vertex):
         """Calculate the average rating for the book based on its reviews.
 
         Return None if there are no reviews for the book.
-        (use the 'reviews' dictionary)
         """
         total_rating = 0
         num_reviews = len(self.neighbours)
@@ -371,7 +357,7 @@ class Graph:
         """Return a path between item1 and item2 in this graph.
 
         The returned list contains the ITEMS along the path.
-        Return None if no such path exists, including when item1 or item2
+        Returns None if no such path exists, including when item1 or item2
         do not appear as vertices in this graph.
         """
         # TODO: check function docstring
@@ -405,7 +391,7 @@ class Graph:
 
         score_type is one of 'unweighted' or 'strict', corresponding to the
         different ways of calculating weighted graph vertex similarity, as described
-        on the assignment handout.
+        in function docstrings.
 
         Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
 
@@ -522,7 +508,7 @@ class Graph:
 
     def find_books_based_on_user_reads(self, user_item: Any, min_rating: Optional[int] = None,
                                        max_books: Optional[int] = 10) -> Union[str, list]:
-        """Find books based on a specific user's reads in this graph.
+        """Find books based on a specific user's reading history in this graph.
 
         Return a list of books read by the specified user, optionally filtered by a minimum rating.
         If min_rating is specified, only return books with ratings greater than or equal to min_rating.
@@ -845,14 +831,16 @@ def _format_reviews(reviews_list: list, max_reviews: Optional[int]) -> str:
 def load_graph(user_reviews_file: str, book_file: str) -> Graph:
     """
     Return a book review system as graph corresponding to the given datasets.
-    Users and Books are the vertices of this graph.
-
+    The Users and Books are the vertices of this graph. Edges can only exist
+    between books and users (i.e. an edge cannot exist between two vertices
+    of the same kind).
 
     Preconditions:
         - user_reviews_file is the path to a CSV file corresponding to the book review data
           format
         - book_file is the path to a CSV file corresponding to the book data
           format
+        
     """
     gr = Graph()
 
