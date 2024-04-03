@@ -80,7 +80,6 @@ class _Vertex:
         >>> b1.check_connected_path("Nelle On the Shore", {u2}) is None
         True
         """
-        # TODO: check function docstring
         if self.item == target_item:
             return [self.item]
 
@@ -112,7 +111,6 @@ class _Vertex:
         >>> b1.check_connected_distance("Nelle On the Shore", set(), 3)  # Returns True: v1, v3, v4, v5
         True
         """
-        # TODO: check function docstring
         if d >= 0 and self.item == target_item:
             return True
 
@@ -130,10 +128,9 @@ class _Vertex:
 
         The unweighted similarity score is calculated by dividing the total number of neighbours that are
         adjacent to both the vertices by the total number of neighbours that are adjacent to either one or
-        both  of them. In the case that the degree of either vertex is found to be 0, the unweighted 
+        both  of them. In the case that the degree of either vertex is found to be 0, the unweighted
         similarity score is computed as 0.
         """
-        # TODO: check function docstring
         if self.degree() == 0 or other.degree() == 0:
             return 0
 
@@ -152,13 +149,12 @@ class _Vertex:
     def similarity_score_strict(self, other: _Vertex) -> float:
         """Return the strict weighted similarity score between this vertex and other.
         This function calculates the similarity score in a similar manner as the function
-        similarity_score_unweighted; however, the numerator only counts common neighbours 
-        that have the same weight on the corresponding edges. When comparing two books, 
-        this means we only count the common users that gave the books the exact same 
+        similarity_score_unweighted; however, the numerator only counts common neighbours
+        that have the same weight on the corresponding edges. When comparing two books,
+        this means we only count the common users that gave the books the exact same
         review score.
-        
+
         """
-        # TODO: check function docstring
         if self.degree() == 0 or other.degree() == 0:
             return 0
 
@@ -360,7 +356,6 @@ class Graph:
         Returns None if no such path exists, including when item1 or item2
         do not appear as vertices in this graph.
         """
-        # TODO: check function docstring
         if item1 in self._vertices and item2 in self._vertices:
             v1 = self._vertices[item1]
             return v1.check_connected_path(item2, set())
@@ -375,7 +370,6 @@ class Graph:
         Preconditions:
             - d >= 0
         """
-        # TODO: check function docstring
         if item1 in self._vertices and item2 in self._vertices:
             v1 = self._vertices[item1]
             return v1.check_connected_distance(item2, set(), d)
@@ -840,7 +834,7 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
           format
         - book_file is the path to a CSV file corresponding to the book data
           format
-        
+
     """
     gr = Graph()
 
