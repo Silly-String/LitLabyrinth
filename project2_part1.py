@@ -24,8 +24,6 @@ import csv
 import networkx as nx
 
 
-# TODO: fix PyTA errors and docstring
-
 class _Vertex:
     """A vertex in a graph.
 
