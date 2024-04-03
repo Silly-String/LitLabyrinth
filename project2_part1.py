@@ -453,35 +453,23 @@ class Graph:
         Return a string message if the book is not found in the graph.
         If info_type is specified, return the requested piece of information about the book.
         """
-        try:
-            average_rating = self.average_rating_for_book(book_item)
-        except ValueError as e:
-            return str(e)
-
-        if isinstance(average_rating, float):
-            book_vertex = self._vertices.get(book_item)
-
-            # Check if the vertex represents a book
-            if isinstance(book_vertex, _Book):
-                book_info = {
-                    'title': book_vertex.item,
-                    'genre': ', '.join(book_vertex.genre),
-                    'author': ', '.join(book_vertex.author),
-                    'blurb': book_vertex.blurb,
-                    'average_rating': average_rating
-                }
-
-                # If info_type is specified, return the requested piece of information
-                if info_type:
-                    return book_info.get(info_type, "Invalid info type specified.")
-                else:
-                    return book_info
+        book_vertex = self._vertices.get(book_item)
+        if isinstance(book_vertex, _Book):
+            book_info = {
+                        'title': book_vertex.item,
+                        'genre': ', '.join(book_vertex.genre),
+                        'author': ', '.join(book_vertex.author),
+                        'blurb': book_vertex.blurb,
+                        'average_rating': self.average_rating_for_book(book_item)
+                    }
+            # If info_type is specified, return the requested piece of information
+            if info_type:
+                return book_info.get(info_type, "Invalid info type specified.")
             else:
-                # The item corresponds to a user, not a book
-                return "The specified item does not correspond to a book."
+                return book_info
         else:
-            # Book not found in the graph or no reviews available
-            return average_rating
+            # The item corresponds to a user, not a book
+            return "The specified item does not correspond to a book."
 
     def get_reviews_for_book(self, book_item: Any, max_reviews: Optional[int] = 10) -> Union[str, list]:
         """Retrieve the list of reviews for a particular book in this graph.
