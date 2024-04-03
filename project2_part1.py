@@ -457,7 +457,7 @@ class Graph:
         if isinstance(book_vertex, _Book):
             book_info = {
                 'title': book_vertex.item,
-                'author': ', '.join(book_vertex.author)
+                'author': ', '.join(book_vertex.author),
                 'genre': ', '.join(book_vertex.genre),
                 'blurb': book_vertex.blurb,
                 'average_rating': self.average_rating_for_book(book_item),
