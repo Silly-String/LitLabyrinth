@@ -23,10 +23,6 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(verbose=True)
 
-    # When you are ready to check your work with python_ta, uncomment the following lines.
-    # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
-    # You can use "Run file in Python Console" to run PythonTA,
-    # and then also test your methods manually in the console.
     import python_ta
     python_ta.check_all(config={
         'max-line-length': 120,
