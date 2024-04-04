@@ -151,7 +151,6 @@ def b_in_g_output(g: project2_part1.Graph, genre: str, r: tkinter.Tk) -> Any:
     Displays all the books in a specific genre
     If there are no books in the genre, displays an empty list
     """
-    # ToDo possible number of books?
     books_in_g_label = tkinter.Label(r, text=g.list_books_by_genre(genre))
     books_in_g_label.bind('<Configure>',
                           lambda _unused_item: books_in_g_label.config(
@@ -213,7 +212,8 @@ def books_by_output(g: project2_part1.Graph, author: str, r: tkinter.Tk) -> Any:
 
 def book_rec(g: project2_part1.Graph, book_lst: set, r: tkinter.Tk) -> Any:
     """
-    Displays a way to get all the books that the user
+    Displays a way to get all the books that the user wants to base a recommendation on and calls
+    the function to display all the books that are recommended
     """
     book_get_label = tkinter.Label(r, text="Please enter the book title(s). If entering more than one book, "
                                            "please seperate each book with a #")
@@ -229,7 +229,7 @@ def book_rec(g: project2_part1.Graph, book_lst: set, r: tkinter.Tk) -> Any:
 
 def books_rec_output(g: project2_part1.Graph, book_lst: set, books: str, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays all the recommended books based on the books in book_lst
     """
     books = books.split('#')
     books_valid = True
@@ -247,7 +247,7 @@ def books_rec_output(g: project2_part1.Graph, book_lst: set, books: str, r: tkin
 
 def most_popular(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays a way to get the number of popular books
     """
     num_books_label = tkinter.Label(r, text="Please enter the number of popular books you would like (up to 10): ")
     num_books_entry = tkinter.Entry(r, bg="#F3CEFF", borderwidth=5)
@@ -262,9 +262,14 @@ def most_popular(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
 
 def most_popular_with_num(g: project2_part1.Graph, num: int, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays num amount of the most popular books
+    If num is greater than 10 or less than 1, then display a message informing the user that they have entered
+    an invalid number of books.
     """
-    popular_books = tkinter.Label(r, text=str(g.most_popular_books(num)))
+    if num <= 10 and num > 0:
+        popular_books = tkinter.Label(r, text=str(g.most_popular_books(num)))
+    else:
+        popular_books = tkinter.Label(r, text="That is not a valid amount of books!!")
     popular_books.bind('<Configure>', lambda _unused_item: popular_books.config(wraplength=popular_books.winfo_width()))
     popular_books.pack()
 
