@@ -838,7 +838,7 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
     """
     gr = Graph()
 
-    with open(book_file, 'r') as file:
+    with open(book_file, 'r', encoding="latin-1") as file:
         book_data = csv.reader(file)
         # Skipping the header
         next(book_data)
@@ -851,7 +851,7 @@ def load_graph(user_reviews_file: str, book_file: str) -> Graph:
 
             _add_book_to_graph(gr, (book_title, pages), authors, genres, summary)
 
-    with open(user_reviews_file, 'r') as file:
+    with open(user_reviews_file, 'r', encoding="latin-1") as file:
         user_data = csv.reader(file)
         # Skipping the header
         next(user_data)
