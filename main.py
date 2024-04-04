@@ -277,7 +277,7 @@ def most_popular_with_num(g: project2_part1.Graph, num: int, r: tkinter.Tk) -> A
 
 
 if __name__ == '__main__':
-    my_graph = project2_part1.load_graph('User testing file.csv', 'Book testing file.csv')
+    my_graph = project2_part1.load_graph('Large User file.csv', 'Large book file.csv')
 
     root = tkinter.Tk()
     root.title("LitLabyrinth: Your Next Reading Adventure")
@@ -339,7 +339,7 @@ if __name__ == '__main__':
                                    command=lambda: excute_choices(str(e.get()), book_set, possible_info, my_graph))
     submit_button.pack()
 
-    my_graph = project2_part1.load_graph('User testing file.csv', 'Book testing file.csv')
+    my_graph = project2_part1.load_graph('Large User file.csv', 'Large book file.csv')
     visualize_graph(my_graph)
 
     root.mainloop()
