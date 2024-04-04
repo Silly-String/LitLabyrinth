@@ -68,7 +68,7 @@ def get_information_input(g: project2_part1.Graph, p_info: list, r: tkinter.Tk) 
 def get_info_check_book(g: project2_part1.Graph, p_info: list, book: Any, r: tkinter.Tk) -> Any:
     """
     Checks if the user had entered a valid book and displays a way for the user to enter the
-    specific information that the user wants
+    specific information that the user wants about the book
     """
     if book not in g.get_all_items('book'):
         book_return = tkinter.Label(r, text="That is not a valid book!")
@@ -89,7 +89,8 @@ def get_info_check_book(g: project2_part1.Graph, p_info: list, book: Any, r: tki
 
 def get_info_output(g: project2_part1.Graph, b: Any, info_request: str, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays the information that the user wanted, info_request, about the book, b
+    If the user asks for invalid information, displays a message informing the user of such
     """
     if info_request == "genre":
         info_label = tkinter.Label(r, text=str(g.get_book_info(b, 'genre')))
@@ -108,37 +109,38 @@ def get_info_output(g: project2_part1.Graph, b: Any, info_request: str, r: tkint
     else:
         info_label = tkinter.Label(r, text="That is not valid information to get!")
 
-    info_label.bind('<Configure>', lambda _: info_label.config(wraplength=info_label.winfo_width()))
+    info_label.bind('<Configure>', lambda _unused_item: info_label.config(wraplength=info_label.winfo_width()))
     info_label.pack()
 
 
 def all_books(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays all the books in the dataset
     """
     books_label = tkinter.Label(r, text=str(g.get_all_items('book')))
-    books_label.bind('<Configure>', lambda _: books_label.config(wraplength=books_label.winfo_width()))
+    books_label.bind('<Configure>', lambda _unused_item: books_label.config(wraplength=books_label.winfo_width()))
     books_label.pack()
 
 
 def all_users(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays all the user in the dataset
     """
     users_label = tkinter.Label(r, text=str(g.get_all_items('user')))
-    users_label.bind('<Configure>', lambda _: users_label.config(wraplength=users_label.winfo_width()))
+    users_label.bind('<Configure>', lambda _unused_item: users_label.config(wraplength=users_label.winfo_width()))
     users_label.pack()
 
 
 def books_in_genre(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays a way to get the genre that the user wants all the books from
     """
     genre_get_label = tkinter.Label(r, text="Please enter what genre you would like to get books in:")
     genre_get_entry = tkinter.Entry(r, bg="#F3CEFF", borderwidth=5)
     genre_get_button = tkinter.Button(r, text='Submit', padx=50, fg="purple",
                                       command=lambda: b_in_g_output(g, str(genre_get_entry.get()), r))
-    genre_get_label.bind('<Configure>', lambda _: genre_get_label.config(wraplength=genre_get_label.winfo_width()))
+    genre_get_label.bind('<Configure>',
+                         lambda _unused_item: genre_get_label.config(wraplength=genre_get_label.winfo_width()))
     genre_get_label.pack()
     genre_get_entry.pack()
     genre_get_button.pack()
@@ -146,23 +148,28 @@ def books_in_genre(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
 
 def b_in_g_output(g: project2_part1.Graph, genre: str, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays all the books in a specific genre
+    If there are no books in the genre, displays an empty list
     """
     # ToDo possible number of books?
     books_in_g_label = tkinter.Label(r, text=g.list_books_by_genre(genre))
-    books_in_g_label.bind('<Configure>', lambda _: books_in_g_label.config(wraplength=books_in_g_label.winfo_width()))
+    books_in_g_label.bind('<Configure>',
+                          lambda _unused_item: books_in_g_label.config(
+                              wraplength=books_in_g_label.winfo_width()))
     books_in_g_label.pack()
 
 
 def books_read_by(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays a way to get the reviewer id of the person that the user wants their read books from
+    and calls the function to get all those books
     """
-    user_get_label = tkinter.Label(r, text="Please enter the user:")
+    user_get_label = tkinter.Label(r, text="Please enter the reviewer:")
     user_get_entry = tkinter.Entry(r, bg="#F3CEFF", borderwidth=5)
     user_get_button = tkinter.Button(r, text='Submit', padx=50, fg="purple",
                                      command=lambda: user_book_reads(g, user_get_entry.get(), r))
-    user_get_label.bind('<Configure>', lambda _: user_get_label.config(wraplength=user_get_label.winfo_width()))
+    user_get_label.bind('<Configure>',
+                        lambda _unused_item: user_get_label.config(wraplength=user_get_label.winfo_width()))
     user_get_label.pack()
     user_get_entry.pack()
     user_get_button.pack()
@@ -170,22 +177,24 @@ def books_read_by(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
 
 def user_book_reads(g: project2_part1.Graph, user_id: Any, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays all the books that the person, user_id, read
+    If the person has not reviewed any books, display a message informing the user of such.
     """
     books_label = tkinter.Label(r, text=str(g.find_books_based_on_user_reads(user_id)))
-    books_label.bind('<Configure>', lambda _: books_label.config(wraplength=books_label.winfo_width()))
+    books_label.bind('<Configure>', lambda _unused_item: books_label.config(wraplength=books_label.winfo_width()))
     books_label.pack()
 
 
 def books_by(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays a way to get the author that the user wants books by and calls the function to display those books
     """
     author_get_label = tkinter.Label(r, text="Please enter the name of the author:")
     author_get_entry = tkinter.Entry(r, bg="#F3CEFF", borderwidth=5)
     author_get_button = tkinter.Button(r, text='Submit', padx=50, fg="purple",
                                        command=books_by_output(g, str(author_get_entry.get()), r))
-    author_get_label.bind('<Configure>', lambda _: author_get_label.config(wraplength=author_get_label.winfo_width()))
+    author_get_label.bind('<Configure>',
+                          lambda _unused_item: author_get_label.config(wraplength=author_get_label.winfo_width()))
     author_get_label.pack()
     author_get_entry.pack()
     author_get_button.pack()
@@ -193,24 +202,26 @@ def books_by(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
 
 def books_by_output(g: project2_part1.Graph, author: str, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays all the books that the author wrote
     """
     books_by_author_label = tkinter.Label(r, text=str(g.books_by_author(author)))
     books_by_author_label.bind('<Configure>',
-                               lambda _: books_by_author_label.config(wraplength=books_by_author_label.winfo_width()))
+                               lambda _unused_item: books_by_author_label.config(
+                                   wraplength=books_by_author_label.winfo_width()))
     books_by_author_label.pack()
 
 
 def book_rec(g: project2_part1.Graph, book_lst: set, r: tkinter.Tk) -> Any:
     """
-    ...
+    Displays a way to get all the books that the user
     """
     book_get_label = tkinter.Label(r, text="Please enter the book title(s). If entering more than one book, "
-                                           "please seperate each book with a ")
+                                           "please seperate each book with a #")
     book_get_entry = tkinter.Entry(r, bg="#F3CEFF", borderwidth=5)
-    book_get_button = tkinter.Button(r, text='Submit', padx=50, fg="purple",
+    book_get_button = tkinter.Button(r, text='Submit', padx=100, fg="purple",
                                      command=lambda: books_rec_output(g, book_lst, str(book_get_entry.get()), r))
-    book_get_label.bind('<Configure>', lambda _: book_get_label.config(wraplength=book_get_label.winfo_width()))
+    book_get_label.bind('<Configure>', lambda _unused_item: book_get_label.config(
+        wraplength=book_get_label.winfo_width()))
     book_get_label.pack()
     book_get_entry.pack()
     book_get_button.pack()
@@ -220,7 +231,7 @@ def books_rec_output(g: project2_part1.Graph, book_lst: set, books: str, r: tkin
     """
     ...
     """
-    books = books.split()
+    books = books.split('#')
     books_valid = True
     for book in books:
         if book not in book_lst:
@@ -229,7 +240,7 @@ def books_rec_output(g: project2_part1.Graph, book_lst: set, books: str, r: tkin
         recommended_books_label = tkinter.Label(r, text="There are invalid books that you entered!")
     else:
         recommended_books_label = tkinter.Label(r, text=str(g.get_book_recommendations(books)))
-    recommended_books_label.bind('<Configure>', lambda _: recommended_books_label.config(
+    recommended_books_label.bind('<Configure>', lambda _unused_item: recommended_books_label.config(
         wraplength=recommended_books_label.winfo_width()))
     recommended_books_label.pack()
 
@@ -242,7 +253,8 @@ def most_popular(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     num_books_entry = tkinter.Entry(r, bg="#F3CEFF", borderwidth=5)
     num_books_button = tkinter.Button(r, text='Submit', padx=50, fg="purple",
                                       command=lambda: most_popular_with_num(g, int(num_books_entry.get()), r))
-    num_books_label.bind('<Configure>', lambda _: num_books_label.config(wraplength=num_books_label.winfo_width()))
+    num_books_label.bind('<Configure>', lambda _unused_item: num_books_label.config(
+        wraplength=num_books_label.winfo_width()))
     num_books_label.pack()
     num_books_button.pack()
     num_books_button.pack()
@@ -253,7 +265,7 @@ def most_popular_with_num(g: project2_part1.Graph, num: int, r: tkinter.Tk) -> A
     ...
     """
     popular_books = tkinter.Label(r, text=str(g.most_popular_books(num)))
-    popular_books.bind('<Configure>', lambda _: popular_books.config(wraplength=popular_books.winfo_width()))
+    popular_books.bind('<Configure>', lambda _unused_item: popular_books.config(wraplength=popular_books.winfo_width()))
     popular_books.pack()
 
 
@@ -288,15 +300,17 @@ if __name__ == '__main__':
                                                            "The program should not quit entirely"
                                                            " unless you close out of this window!")
 
-    menu_intro_label.bind('<Configure>', lambda _: menu_intro_label.config(wraplength=menu_intro_label.winfo_width()))
-    menu_label.bind('<Configure>', lambda _: menu_label.config(wraplength=menu_label.winfo_width()))
+    menu_intro_label.bind('<Configure>',
+                          lambda _unused_item: menu_intro_label.config(wraplength=menu_intro_label.winfo_width()))
+    menu_label.bind('<Configure>', lambda _unused_item: menu_label.config(wraplength=menu_label.winfo_width()))
     menu_clarification.bind('<Configure>',
-                            lambda _: menu_clarification.config(wraplength=menu_clarification.winfo_width()))
+                            lambda _unused_item: menu_clarification.config(wraplength=menu_clarification.winfo_width()))
     exit_clarification.bind('<Configure>',
-                            lambda _: exit_clarification.config(wraplength=exit_clarification.winfo_width()))
+                            lambda _unused_item: exit_clarification.config(wraplength=exit_clarification.winfo_width()))
     error_clarification.bind('<Configure>',
-                             lambda _: error_clarification.config(wraplength=error_clarification.winfo_width()))
-    after_command_clarification.bind('<Configure>', lambda _: after_command_clarification.config(
+                             lambda _unused_item: error_clarification.config(
+                                 wraplength=error_clarification.winfo_width()))
+    after_command_clarification.bind('<Configure>', lambda _unused_item: after_command_clarification.config(
         wraplength=after_command_clarification.winfo_width()))
 
     menu_intro_label.pack()
