@@ -1,10 +1,10 @@
 """CSC111 Project 2: Applications of trees and graphs
 
-Instructions (READ THIS FIRST!)
+Description
 ===============================
 
-This Python module contains the code for Project 2. Please consult
-the project handout for instructions and details.
+This Python module contains the main code for Project 2. It contains all the code that
+creates a gui for the user to interact with and draws from code in project2_part1.py.
 
 Copyright and Usage Information
 ===============================
