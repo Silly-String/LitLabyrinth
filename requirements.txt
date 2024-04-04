@@ -1,4 +1,4 @@
-# CSC111 Winter 2024: Python libraries we used this semester + project_2 libraries.
+# CSC111 Winter 2024: Python libraries needed for Project 2
 
 # Testing and code checking
 hypothesis
@@ -9,10 +9,42 @@ python-ta~=2.7.0
 plotly>=5.18.0
 pygame==2.5.2
 
-# Specific to a later exercise
+# Specific to a our project
 networkx
+
+# Other libraries that appear to be externally downloaded for this project when we open
+# the Python Interpreter in settings as stated in the Project 2 handout
 numpy
 scipy
 kaleido
-
-# no additional libraries we needed for project_2
+Jinja2
+MarkupSafe
+Pygments
+SciPy
+astroid
+attrs
+certifi
+charset-normalizer
+click
+colorama
+dill
+idna
+iniconfig
+isort
+mccabe
+packaging
+pip
+platformdirs
+pluggy
+pycodestyle
+pylint
+requests
+six
+sortedcontainers
+tabulate
+tenacity
+toml
+tomlkit
+typeguard
+urllib3
+wrapt
