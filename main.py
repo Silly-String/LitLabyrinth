@@ -41,7 +41,7 @@ def excute_choices(c: str, book_lst: set, p_info: list, g: project2_part1.Graph)
         books_in_genre(g, r)
     elif c == "books by":
         books_by(g, r)
-    elif c == "books read by":
+    elif c == "find books read by":
         books_read_by(g, r)
     elif c == "book recommendations":
         book_rec(g, book_lst, r)
@@ -136,7 +136,8 @@ def books_in_genre(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     """
     Displays a way to get the genre that the user wants all the books from
     """
-    genre_get_label = tkinter.Label(r, text="Please enter what genre you would like to get books in:")
+    genre_get_label = tkinter.Label(r, text="Please enter what genre you would like to get books in "
+                                            "(You must capitalize the first letter):")
     genre_get_entry = tkinter.Entry(r, bg="#F3CEFF", borderwidth=5)
     genre_get_button = tkinter.Button(r, text='Submit', padx=50, fg="purple",
                                       command=lambda: b_in_g_output(g, str(genre_get_entry.get()), r))
@@ -189,10 +190,10 @@ def books_by(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     """
     Displays a way to get the author that the user wants books by and calls the function to display those books
     """
-    author_get_label = tkinter.Label(r, text="Please enter the name of the author:")
+    author_get_label = tkinter.Label(r, text="Please enter the name of the author: ")
     author_get_entry = tkinter.Entry(r, bg="#F3CEFF", borderwidth=5)
     author_get_button = tkinter.Button(r, text='Submit', padx=50, fg="purple",
-                                       command=books_by_output(g, str(author_get_entry.get()), r))
+                                       command=lambda: books_by_output(g, str(author_get_entry.get()), r))
     author_get_label.bind('<Configure>',
                           lambda _unused_item: author_get_label.config(wraplength=author_get_label.winfo_width()))
     author_get_label.pack()
@@ -257,7 +258,7 @@ def most_popular(g: project2_part1.Graph, r: tkinter.Tk) -> Any:
     num_books_label.bind('<Configure>', lambda _unused_item: num_books_label.config(
         wraplength=num_books_label.winfo_width()))
     num_books_label.pack()
-    num_books_button.pack()
+    num_books_entry.pack()
     num_books_button.pack()
 
 
@@ -282,7 +283,7 @@ if __name__ == '__main__':
     root.title("LitLabyrinth: Your Next Reading Adventure")
 
     # The menu for all the actions that the user can do
-    menu = ["get information (information)", "books in genre", "all books", "all users",
+    menu = ["get information (information)", "books in (genre)", "all books", "all users",
             "find books read by (user)", "books by (author)", "book recommendations (book)", "most popular"]
 
     # a list of possible information that the user can request from a book
