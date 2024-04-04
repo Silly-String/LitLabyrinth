@@ -21,6 +21,7 @@ import doctest
 import tkinter
 from typing import Any
 import project2_part1
+from project2_visualization import visualize_graph
 
 
 def excute_choices(c: str, book_lst: set, p_info: list, g: project2_part1.Graph) -> Any:
@@ -266,7 +267,7 @@ def most_popular_with_num(g: project2_part1.Graph, num: int, r: tkinter.Tk) -> A
     If num is greater than 10 or less than 1, then display a message informing the user that they have entered
     an invalid number of books.
     """
-    if num <= 10 and num > 0:
+    if 0 < num <= 10:
         popular_books = tkinter.Label(r, text=str(g.most_popular_books(num)))
     else:
         popular_books = tkinter.Label(r, text="That is not a valid amount of books!!")
@@ -304,7 +305,10 @@ if __name__ == '__main__':
                                                            "feel free to close out the additional windows."
                                                            "The program should not quit entirely"
                                                            " unless you close out of this window!")
-
+    visualize_warning = tkinter.Label(root, text="A helpful graph should appear in another window right now!"
+                                                 "The purple dots have book titles, if you hover over it and "
+                                                 "the blue dots have the names of users that reviewed those "
+                                                 "books!!")
     menu_intro_label.bind('<Configure>',
                           lambda _unused_item: menu_intro_label.config(wraplength=menu_intro_label.winfo_width()))
     menu_label.bind('<Configure>', lambda _unused_item: menu_label.config(wraplength=menu_label.winfo_width()))
@@ -317,6 +321,8 @@ if __name__ == '__main__':
                                  wraplength=error_clarification.winfo_width()))
     after_command_clarification.bind('<Configure>', lambda _unused_item: after_command_clarification.config(
         wraplength=after_command_clarification.winfo_width()))
+    visualize_warning.bind('<Configure>', lambda _unused_item: visualize_warning.config(
+        wraplength=visualize_warning.winfo_width()))
 
     menu_intro_label.pack()
     menu_label.pack()
@@ -324,13 +330,16 @@ if __name__ == '__main__':
     exit_clarification.pack()
     error_clarification.pack()
     after_command_clarification.pack()
-
+    visualize_warning.pack()
     e = tkinter.Entry(root, bg="#F3CEFF", borderwidth=5)
     e.pack()
 
     submit_button = tkinter.Button(root, text='Submit', padx=50, fg="purple",
                                    command=lambda: excute_choices(str(e.get()), book_set, possible_info, my_graph))
     submit_button.pack()
+
+    my_graph = project2_part1.load_graph('User testing file.csv', 'Book testing file.csv')
+    visualize_graph(my_graph)
 
     root.mainloop()
 
@@ -339,6 +348,6 @@ if __name__ == '__main__':
     import python_ta
 
     python_ta.check_all(config={
-        'extra-imports': ['sys', 'project2_part1', 'tkinter', 'networkx', 'typing'],
+        'extra-imports': ['project2_part1', 'tkinter', 'networkx', 'typing', 'project2_visualization'],
         'max-line-length': 120,
     })
