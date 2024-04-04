@@ -489,7 +489,7 @@ class Graph:
         # Iterate over all vertices in the graph
         for vertex in self._vertices.values():
             # Check if the vertex represents a book and if its genre matches the specified genre
-            if isinstance(vertex, _Book) and vertex.genre == genre:
+            if isinstance(vertex, _Book) and genre in vertex.genre:
                 # Add the book title to the list
                 book_titles.append(vertex.item)
 
@@ -560,8 +560,8 @@ class Graph:
             author_similar_books = author_similar_books[:max_books]
 
             # Add recommendations to the dictionary
-            recommendations['books with similar genre'].append(genre_similar_books)
-            recommendations['books with similar author'].append(author_similar_books)
+            recommendations['books with similar genre'].extend(genre_similar_books)
+            recommendations['books with similar author'].extend(author_similar_books)
 
         return recommendations
 
@@ -652,7 +652,8 @@ class Graph:
 
         # Extract the book items from the sorted list
         for book, _unused_item in sorted_scores[:num_books]:
-            similar_books.append(book)
+            if _unused_item > 0:
+                similar_books.append(book)
 
         # Return the list of book items with the highest similarity scores
         return similar_books
@@ -720,7 +721,8 @@ class Graph:
 
         # Extract the book items from the sorted list
         for book, _unused_item in sorted_scores[:num_books]:
-            similar_books.append(book)
+            if _unused_item > 0:
+                similar_books.append(book)
 
         # Return the list of book items with the highest similarity scores
         return similar_books
