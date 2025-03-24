@@ -20,7 +20,7 @@ To run this project, we recommend using an IDE. We used PyCharm and the PyCharm 
    git clone https://github.com/github_username/repo_name.git
    ```
 2. Install Python libraries:
-   ```sh
+```sh
    pip install -r requirements.txt
    ```
 3. Run main.py
@@ -29,7 +29,7 @@ To run this project, we recommend using an IDE. We used PyCharm and the PyCharm 
 When you run main.py you should get the following:
 #TODO: Add image.
 <br />
-The User Interface where you can use the program by following the dirrections on screen.
+The User Interface is where you can use the program by following the directions on the screen.
 <br />
 #TODO: Add image.
 The graph displaying the relationships between books, reviews, and the connections between books themselves.
